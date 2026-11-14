@@ -1,0 +1,43 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      - 'bicepconfig.json'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+# Never run two deployments at once.
+concurrency:
+  group: deploy-lz
+  cancel-in-progress: false
+
+env:
+  AZURE_CORE_NO_COLOR: 'true'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy (named after the commit)
+        shell: bash
+        run: |
+          NAME="lz-${GITHUB_SHA::7}-run${GITHUB_RUN_NUMBER}"
+          echo "Deployment name: $NAME"
+          az deployment sub create \
+            --name "$NAME" \
+            --location eastus2 \
+            --parameters infra/main.bicepparam
+          echo "Deployed commit ${GITHUB_SHA} as Azure deployment ${NAME}" >> "$GITHUB_STEP_SUMMARY"
