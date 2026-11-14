@@ -35,3 +35,4 @@ output resourceGroupNames array = [
   rgWorkloads.name
   rgManagement.name
 ]
+param unusedTest string = 'x'
