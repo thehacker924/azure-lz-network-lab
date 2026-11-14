@@ -6,4 +6,5 @@ param tags = {
   project: 'azure-lz-network-lab'
   environment: 'lab'
   managedBy: 'bicep'
+  costCenter: 'lab-demo'
 }
