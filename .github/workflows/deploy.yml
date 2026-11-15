@@ -13,7 +13,6 @@ permissions:
   id-token: write
   contents: read
 
-# Never run two deployments at once.
 concurrency:
   group: deploy-lz
   cancel-in-progress: false
@@ -24,6 +23,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Waits for approval. The OIDC token and the client ID
+    # (an environment secret) exist only after you approve.
+    environment: lz-lab
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v2
@@ -31,13 +33,13 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy (named after the commit)
+      - name: Deploy connectivity (named after the commit)
         shell: bash
         run: |
           NAME="lz-${GITHUB_SHA::7}-run${GITHUB_RUN_NUMBER}"
           echo "Deployment name: $NAME"
-          az deployment sub create \
+          az deployment group create \
             --name "$NAME" \
-            --location eastus2 \
-            --parameters infra/main.bicepparam
-          echo "Deployed commit ${GITHUB_SHA} as Azure deployment ${NAME}" >> "$GITHUB_STEP_SUMMARY"
+            --resource-group rg-lz-connectivity \
+            --template-file infra/connectivity.bicep
+          echo "Deployed commit ${GITHUB_SHA} to rg-lz-connectivity as ${NAME}" >> "$GITHUB_STEP_SUMMARY"
