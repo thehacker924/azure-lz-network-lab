@@ -33,7 +33,7 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy connectivity (named after the commit)
+      - name: Deploy network (named after the commit)
         shell: bash
         run: |
           NAME="lz-${GITHUB_SHA::7}-run${GITHUB_RUN_NUMBER}"
@@ -41,5 +41,5 @@ jobs:
           az deployment group create \
             --name "$NAME" \
             --resource-group rg-lz-connectivity \
-            --template-file infra/connectivity.bicep
-          echo "Deployed commit ${GITHUB_SHA} to rg-lz-connectivity as ${NAME}" >> "$GITHUB_STEP_SUMMARY"
+            --parameters infra/network.bicepparam
+          echo "Deployed commit ${GITHUB_SHA} as ${NAME}" >> "$GITHUB_STEP_SUMMARY"

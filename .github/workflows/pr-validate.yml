@@ -26,7 +26,10 @@ jobs:
             echo "Linting $f"
             az bicep build --file "$f" --stdout > /dev/null
           done
-          az bicep build-params --file bootstrap/main.bicepparam --stdout > /dev/null
+          for p in bootstrap/main.bicepparam infra/*.bicepparam; do
+            echo "Checking $p"
+            az bicep build-params --file "$p" --stdout > /dev/null
+          done
           echo "Lint passed" >> "$GITHUB_STEP_SUMMARY"
 
   what-if:
@@ -45,11 +48,14 @@ jobs:
           az deployment group what-if \
             --name "pr-${{ github.event.pull_request.number }}" \
             --resource-group rg-lz-connectivity \
-            --template-file infra/connectivity.bicep \
+            --parameters infra/network.bicepparam \
             --validation-level ProviderNoRbac | tee whatif.txt
           {
-            echo "## What-if for PR #${{ github.event.pull_request.number }} (rg-lz-connectivity)"
+            echo "## What-if for PR #${{ github.event.pull_request.number }}"
             echo '```'
             cat whatif.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          if grep -qE '[1-9][0-9]* to delete' whatif.txt; then
+            echo "::warning title=What-if shows deletions::This PR would delete resources. Read the what-if summary before merging."
+          fi
