@@ -11,7 +11,7 @@ param tags object
 @description('Address space, for example 10.101.0.0/22.')
 param addressPrefix string
 
-@description('Subnets: each item has name and addressPrefix.')
+@description('Subnets: each item has name, addressPrefix and nsg (empty string for none).')
 param subnets array
 
 resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
@@ -26,11 +26,18 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
     }
     subnets: [for subnet in subnets: {
       name: subnet.name
-      properties: {
-        addressPrefix: subnet.addressPrefix
-        // Private subnet: no hidden internet access for VMs.
-        defaultOutboundAccess: false
-      }
+      properties: union(
+        {
+          addressPrefix: subnet.addressPrefix
+          // Private subnet: no hidden internet access for VMs.
+          defaultOutboundAccess: false
+        },
+        empty(subnet.nsg) ? {} : {
+          networkSecurityGroup: {
+            id: resourceId('Microsoft.Network/networkSecurityGroups', subnet.nsg)
+          }
+        }
+      )
     }]
   }
 }

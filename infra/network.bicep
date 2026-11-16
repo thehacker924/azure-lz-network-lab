@@ -1,11 +1,11 @@
 // Landing zone network. Deployed into rg-lz-connectivity by the pipeline.
-// Hub lives here; spokes live in the workloads resource group.
+// Hub lives here; spokes, NSGs and ASGs live in the workloads resource group.
 targetScope = 'resourceGroup'
 
 @description('Region for every resource. Defaults to this resource group region.')
 param location string = resourceGroup().location
 
-@description('Resource group that holds the spoke networks.')
+@description('Resource group that holds the spoke networks, NSGs and ASGs.')
 param workloadsResourceGroup string
 
 @description('Tags applied to every resource.')
@@ -17,7 +17,40 @@ param hub object
 @description('Spoke networks: each has name, addressPrefix, subnets.')
 param spokes array
 
+@description('Application security groups to create in the workloads resource group.')
+param asgNames array
+
+// Rules as data: one file per NSG in network-policy/.
+var nsgPolicies = [
+  loadJsonContent('../network-policy/nsg-lz-spoke1-web.json')
+  loadJsonContent('../network-policy/nsg-lz-spoke1-app.json')
+  loadJsonContent('../network-policy/nsg-lz-spoke2-data.json')
+]
+
 var hubVnetId = resourceId('Microsoft.Network/virtualNetworks', hub.name)
+
+module asgs 'modules/asgs.bicep' = {
+  name: 'sec-asgs'
+  scope: resourceGroup(workloadsResourceGroup)
+  params: {
+    names: asgNames
+    location: location
+    tags: tags
+  }
+}
+
+module nsgs 'modules/nsg.bicep' = [for policy in nsgPolicies: {
+  name: 'sec-${policy.nsgName}'
+  scope: resourceGroup(workloadsResourceGroup)
+  params: {
+    policy: policy
+    location: location
+    tags: tags
+  }
+  dependsOn: [
+    asgs
+  ]
+}]
 
 module hubVnet 'modules/vnet.bicep' = {
   name: 'net-${hub.name}'
@@ -40,6 +73,9 @@ module spokeVnets 'modules/vnet.bicep' = [for spoke in spokes: {
     addressPrefix: spoke.addressPrefix
     subnets: spoke.subnets
   }
+  dependsOn: [
+    nsgs
+  ]
 }]
 
 // Hub side: one at a time, because both write to the same hub VNet.
