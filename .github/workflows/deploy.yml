@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'infra/**'
+      - 'network-policy/**'
       - 'bicepconfig.json'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:

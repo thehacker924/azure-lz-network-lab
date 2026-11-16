@@ -18,6 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check rule files are valid JSON
+        shell: bash
+        run: |
+          for f in network-policy/*.json; do
+            echo "Checking $f"
+            python3 -m json.tool "$f" > /dev/null
+          done
       - name: Lint and compile Bicep
         shell: bash
         run: |

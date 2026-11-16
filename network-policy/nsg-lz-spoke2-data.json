@@ -1,0 +1,51 @@
+{
+  "nsgName": "nsg-lz-spoke2-data",
+  "description": "Data tier subnet (spoke2)",
+  "rules": [
+    {
+      "name": "Allow-AzureLoadBalancer-Inbound",
+      "priority": 1000,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "*",
+      "source": "AzureLoadBalancer",
+      "sourceAsg": "",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "*"
+      ],
+      "description": "Platform health probes. Needed because of the explicit deny at 4000."
+    },
+    {
+      "name": "Allow-AppSubnet-To-Data-5432",
+      "priority": 2000,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "source": "10.101.1.0/24",
+      "sourceAsg": "",
+      "destination": "",
+      "destinationAsg": "asg-lz-data",
+      "ports": [
+        "5432"
+      ],
+      "description": "App subnet (spoke1) to database servers. Uses a range because ASGs don't match across VNets."
+    },
+    {
+      "name": "Deny-All-Inbound",
+      "priority": 4000,
+      "direction": "Inbound",
+      "access": "Deny",
+      "protocol": "*",
+      "source": "*",
+      "sourceAsg": "",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "*"
+      ],
+      "description": "Overrides the default AllowVnetInBound (65000)."
+    }
+  ]
+}

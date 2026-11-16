@@ -9,7 +9,14 @@ param tags = {
   costCenter: 'lab-demo'
 }
 
+param asgNames = [
+  'asg-lz-web'
+  'asg-lz-app'
+  'asg-lz-data'
+]
+
 // 10.100.0.0/26 and 10.100.0.64/26 are reserved for the firewall subnets (Phase 7).
+// snet-shared gets its NSG in Phase 7.
 param hub = {
   name: 'vnet-lz-hub'
   addressPrefix: '10.100.0.0/22'
@@ -17,6 +24,7 @@ param hub = {
     {
       name: 'snet-shared'
       addressPrefix: '10.100.1.0/24'
+      nsg: ''
     }
   ]
 }
@@ -29,10 +37,12 @@ param spokes = [
       {
         name: 'snet-web'
         addressPrefix: '10.101.0.0/24'
+        nsg: 'nsg-lz-spoke1-web'
       }
       {
         name: 'snet-app'
         addressPrefix: '10.101.1.0/24'
+        nsg: 'nsg-lz-spoke1-app'
       }
     ]
   }
@@ -43,6 +53,7 @@ param spokes = [
       {
         name: 'snet-data'
         addressPrefix: '10.102.0.0/24'
+        nsg: 'nsg-lz-spoke2-data'
       }
     ]
   }
