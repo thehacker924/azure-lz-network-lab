@@ -25,6 +25,19 @@ jobs:
             echo "Checking $f"
             python3 -m json.tool "$f" > /dev/null
           done
+      - name: Analyze NSG rules (duplicates, conflicts, shadowed, too open)
+        shell: bash
+        run: |
+          # "|| true" lets us write the summary first; the last line decides pass/fail.
+          python3 migration/analyze_rules.py network-policy > analysis.txt || true
+          cat analysis.txt
+          {
+            echo "## NSG rule analysis"
+            echo '```'
+            cat analysis.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -q "Result: 0 error(s)" analysis.txt
       - name: Lint and compile Bicep
         shell: bash
         run: |

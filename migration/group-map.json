@@ -1,0 +1,7 @@
+{
+  "_readme": "How each NSX security group maps to Azure. asg = the ASG to use (empty if none), vnet = which VNet its VMs live in, subnet = its address range, nsg = the NSG that protects it (empty if none).",
+  "SG-WEB":  { "asg": "asg-lz-web",  "vnet": "vnet-lz-spoke1", "subnet": "10.101.0.0/24", "nsg": "nsg-lz-spoke1-web" },
+  "SG-APP":  { "asg": "asg-lz-app",  "vnet": "vnet-lz-spoke1", "subnet": "10.101.1.0/24", "nsg": "nsg-lz-spoke1-app" },
+  "SG-DB":   { "asg": "asg-lz-data", "vnet": "vnet-lz-spoke2", "subnet": "10.102.0.0/24", "nsg": "nsg-lz-spoke2-data" },
+  "SG-MGMT": { "asg": "",            "vnet": "vnet-lz-hub",    "subnet": "10.100.1.0/24", "nsg": "" }
+}

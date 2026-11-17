@@ -1,6 +1,6 @@
 {
   "nsgName": "nsg-lz-spoke1-web",
-  "description": "Web tier subnet (spoke1)",
+  "description": "Translated from NSX (nsg-lz-spoke1-web)",
   "rules": [
     {
       "name": "Allow-AzureLoadBalancer-Inbound",
@@ -18,19 +18,19 @@
       "description": "Platform health probes. Needed because of the explicit deny at 4000."
     },
     {
-      "name": "Allow-HTTPS-Corp-To-Web",
+      "name": "NSX1001-web-https-in",
       "priority": 2000,
       "direction": "Inbound",
       "access": "Allow",
       "protocol": "Tcp",
-      "source": "172.16.0.0/12",
+      "source": "*",
       "sourceAsg": "",
       "destination": "",
       "destinationAsg": "asg-lz-web",
       "ports": [
         "443"
       ],
-      "description": "Fictional corporate network to web servers over HTTPS."
+      "description": "From NSX rule 1001 (web-https-in)."
     },
     {
       "name": "Deny-All-Inbound",
