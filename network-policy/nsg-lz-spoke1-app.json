@@ -28,7 +28,7 @@
       "destination": "",
       "destinationAsg": "asg-lz-app",
       "ports": [
-        "8080"
+        "8443"
       ],
       "description": "Web servers to app servers (same VNet, so ASGs work)."
     },
