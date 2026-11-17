@@ -1,6 +1,6 @@
 {
   "nsgName": "nsg-lz-spoke1-app",
-  "description": "App tier subnet (spoke1)",
+  "description": "Translated from NSX (nsg-lz-spoke1-app)",
   "rules": [
     {
       "name": "Allow-AzureLoadBalancer-Inbound",
@@ -18,7 +18,22 @@
       "description": "Platform health probes. Needed because of the explicit deny at 4000."
     },
     {
-      "name": "Allow-Web-To-App-8080",
+      "name": "NSX1006-mgmt-rdp-app",
+      "priority": 1100,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "source": "10.100.1.0/24",
+      "sourceAsg": "",
+      "destination": "",
+      "destinationAsg": "asg-lz-app",
+      "ports": [
+        "3389"
+      ],
+      "description": "From NSX rule 1006 (mgmt-rdp-app)."
+    },
+    {
+      "name": "NSX1002-web-to-app",
       "priority": 2000,
       "direction": "Inbound",
       "access": "Allow",
@@ -30,7 +45,7 @@
       "ports": [
         "8443"
       ],
-      "description": "Web servers to app servers (same VNet, so ASGs work)."
+      "description": "From NSX rule 1002 (web-to-app)."
     },
     {
       "name": "Deny-All-Inbound",
@@ -46,6 +61,51 @@
         "*"
       ],
       "description": "Overrides the default AllowVnetInBound (65000)."
+    },
+    {
+      "name": "NSX1007-app-https-out",
+      "priority": 2000,
+      "direction": "Outbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "source": "",
+      "sourceAsg": "asg-lz-app",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "443"
+      ],
+      "description": "From NSX rule 1007 (app-https-out)."
+    },
+    {
+      "name": "NSX1009-app-smtp-block",
+      "priority": 2010,
+      "direction": "Outbound",
+      "access": "Deny",
+      "protocol": "Tcp",
+      "source": "",
+      "sourceAsg": "asg-lz-app",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "25"
+      ],
+      "description": "From NSX rule 1009 (app-smtp-block)."
+    },
+    {
+      "name": "NSX1012-legacy-ftp",
+      "priority": 2020,
+      "direction": "Outbound",
+      "access": "Deny",
+      "protocol": "Tcp",
+      "source": "",
+      "sourceAsg": "asg-lz-app",
+      "destination": "10.50.0.0/24",
+      "destinationAsg": "",
+      "ports": [
+        "21"
+      ],
+      "description": "From NSX rule 1012 (legacy-ftp)."
     }
   ]
 }

@@ -1,0 +1,12 @@
+rule_id,category,name,source,destination,service,action,applied_to,state
+1001,Application,web-https-in,ANY,SG-WEB,TCP/443,ALLOW,DFW,enabled
+1002,Application,web-to-app,SG-WEB,SG-APP,TCP/8443,ALLOW,DFW,enabled
+1003,Application,app-to-db,SG-APP,SG-DB,TCP/1433,ALLOW,DFW,enabled
+1005,Application,web-to-db-block,SG-WEB,SG-DB,TCP/1433,DROP,DFW,enabled
+1006,Infrastructure,mgmt-rdp-app,SG-MGMT,SG-APP,TCP/3389,ALLOW,DFW,enabled
+1007,Application,app-https-out,SG-APP,ANY,TCP/443,ALLOW,DFW,enabled
+1009,Application,app-smtp-block,SG-APP,ANY,TCP/25,DROP,DFW,enabled
+1010,Application,web-updates,SG-WEB,FQDN:*.windowsupdate.com,TCP/443,ALLOW,DFW,enabled
+1011,Application,hr-portal,ADGROUP:HR-Users,SG-APP,TCP/443,ALLOW,DFW,enabled
+1012,Application,legacy-ftp,SG-APP,10.50.0.0/24,TCP/21,REJECT,DFW,enabled
+1013,Application,old-test-rule,SG-WEB,SG-APP,TCP/9000,ALLOW,DFW,disabled

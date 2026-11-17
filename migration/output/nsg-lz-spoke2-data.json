@@ -1,0 +1,66 @@
+{
+  "nsgName": "nsg-lz-spoke2-data",
+  "description": "Translated from NSX (nsg-lz-spoke2-data)",
+  "rules": [
+    {
+      "name": "Allow-AzureLoadBalancer-Inbound",
+      "priority": 1000,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "*",
+      "source": "AzureLoadBalancer",
+      "sourceAsg": "",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "*"
+      ],
+      "description": "Platform health probes. Needed because of the explicit deny at 4000."
+    },
+    {
+      "name": "NSX1003-app-to-db",
+      "priority": 2000,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "source": "10.101.1.0/24",
+      "sourceAsg": "",
+      "destination": "",
+      "destinationAsg": "asg-lz-data",
+      "ports": [
+        "1433"
+      ],
+      "description": "From NSX rule 1003 (app-to-db)."
+    },
+    {
+      "name": "NSX1005-web-to-db-block",
+      "priority": 2010,
+      "direction": "Inbound",
+      "access": "Deny",
+      "protocol": "Tcp",
+      "source": "10.101.0.0/24",
+      "sourceAsg": "",
+      "destination": "",
+      "destinationAsg": "asg-lz-data",
+      "ports": [
+        "1433"
+      ],
+      "description": "From NSX rule 1005 (web-to-db-block)."
+    },
+    {
+      "name": "Deny-All-Inbound",
+      "priority": 4000,
+      "direction": "Inbound",
+      "access": "Deny",
+      "protocol": "*",
+      "source": "*",
+      "sourceAsg": "",
+      "destination": "*",
+      "destinationAsg": "",
+      "ports": [
+        "*"
+      ],
+      "description": "Overrides the default AllowVnetInBound (65000)."
+    }
+  ]
+}
